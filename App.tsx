@@ -242,13 +242,17 @@ export default function App() {
       return;
     }
 
-    const newProfile = {
+    const interests: ActivityType[] = draftProfile.interests.length
+      ? draftProfile.interests
+      : ["eateries"];
+
+    const newProfile: Profile = {
       ...draftProfile,
       name,
       availability: draftProfile.availability.trim() || "Flexible",
       location: draftProfile.location.trim() || "Current location",
       foodPreferences: draftProfile.foodPreferences.trim() || "open to anything",
-      interests: draftProfile.interests.length ? draftProfile.interests : ["eateries"],
+      interests,
     };
 
     setProfiles((current) => [...current, newProfile]);
