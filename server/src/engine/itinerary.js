@@ -150,9 +150,14 @@ function buildItinerary(req, pool, merged, profiles, variantCfg, globalUsed) {
     const arrive = cursor + (stops.length === 0 ? 0 : travel);
     const leave = arrive + s.venue.durationMin;
     const isFood = s.venue.kind === 'food';
-    const mealLabel = isFood
-      ? (usedWant.meal && usedWant.meal !== 'any' ? usedWant.meal : (mealFromHour(Math.floor(arrive / 60)) || 'bite'))
+    // The meal we set out to fill (for bookkeeping) vs. the label we show the user.
+    const slotMeal = isFood
+      ? (usedWant.meal && usedWant.meal !== 'any' ? usedWant.meal : (mealFromHour(Math.floor(arrive / 60)) || 'dessert'))
       : null;
+    let mealLabel = slotMeal;
+    if (mealLabel === 'dessert' && !s.venue.meals?.includes('dessert') && s.venue.meals?.includes('drinks')) {
+      mealLabel = 'drinks';
+    }
 
     stops.push({
       id: s.venue.id,
@@ -178,7 +183,7 @@ function buildItinerary(req, pool, merged, profiles, variantCfg, globalUsed) {
     cursor = leave;
     localUsed.add(s.venue.id);
     globalUsed.add(s.venue.id);
-    if (isFood && mealLabel) mealsDone.add(mealLabel === 'bite' ? 'dessert' : mealLabel);
+    if (isFood && slotMeal) mealsDone.add(slotMeal);
     prevCoord = s.venue;
   }
 
