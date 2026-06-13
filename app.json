@@ -1,0 +1,42 @@
+{
+  "expo": {
+    "name": "Wonder",
+    "slug": "wonder",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "automatic",
+    "scheme": "wonder",
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.wonder.app",
+      "infoPlist": {
+        "NSLocationWhenInUseUsageDescription": "Wonder uses your location to find nearby activities and restaurants within your chosen radius."
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#1a0a2e",
+        "foregroundImage": "./assets/android-icon-foreground.png",
+        "backgroundImage": "./assets/android-icon-background.png",
+        "monochromeImage": "./assets/android-icon-monochrome.png"
+      },
+      "package": "com.wonder.app",
+      "permissions": ["ACCESS_COARSE_LOCATION", "ACCESS_FINE_LOCATION"],
+      "predictiveBackGestureEnabled": false
+    },
+    "web": {
+      "favicon": "./assets/favicon.png",
+      "bundler": "metro"
+    },
+    "plugins": [
+      "expo-router",
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "Wonder uses your location to find nearby activities and restaurants within your chosen radius."
+        }
+      ]
+    ]
+  }
+}
