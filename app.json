@@ -1,0 +1,22 @@
+{
+  "expo": {
+    "name": "Wonder",
+    "slug": "wonder",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "backgroundColor": "#fff7ed"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.wonder.itineraries"
+    },
+    "android": {
+      "package": "com.wonder.itineraries",
+      "adaptiveIcon": {
+        "backgroundColor": "#fff7ed"
+      }
+    }
+  }
+}
