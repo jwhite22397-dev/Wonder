@@ -23,8 +23,8 @@
   "homepage": "https://github.com/jwhite22397-dev/Wonder#readme",
   "dependencies": {
     "expo": "^56.0.11",
-    "react": "^19.2.7",
-    "react-native": "^0.86.0"
+    "react": "19.2.3",
+    "react-native": "0.85.3"
   },
   "devDependencies": {
     "@types/react": "^19.2.17",
