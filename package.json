@@ -7,6 +7,9 @@
     "server",
     "client"
   ],
+  "engines": {
+    "node": ">=20"
+  },
   "scripts": {
     "install:all": "npm install",
     "dev": "concurrently -n server,client -c blue,magenta \"npm:dev:server\" \"npm:dev:client\"",

@@ -111,6 +111,23 @@ npm start          # the API server also serves the built client at :4000
 
 Open **http://localhost:4000** and "Add to Home Screen" to install it as an app.
 
+### Deploy & install on your phone (no terminal needed)
+
+Wonder is a PWA, so you install it by opening it at a public HTTPS URL and tapping
+**Add to Home screen** — no `.apk` required. A `render.yaml` blueprint is included so you
+can deploy entirely from a phone browser:
+
+1. Go to **[dashboard.render.com](https://dashboard.render.com)** and sign in with GitHub.
+2. **New + → Blueprint**, pick this repo, choose the branch, and **Apply**. Render reads
+   `render.yaml`, installs, builds, and starts the app (one web service serving API + UI).
+3. When it's live, open the `…onrender.com` URL in **Chrome** → **⋮ → Install app /
+   Add to Home screen**. Sign up in the app and start planning.
+
+Notes: Render's free tier sleeps after inactivity (first load may take ~30–60s to wake), and
+its filesystem is ephemeral — for durable accounts/plans add a persistent disk or an external
+database. To remove the browser address bar (full TWA), serve the `assetlinks.json` from a
+generated Android package; not needed just to test.
+
 ### Configuration
 
 The server reads these optional environment variables:

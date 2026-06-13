@@ -1,0 +1,20 @@
+# One-click deploy for Wonder on Render (https://render.com).
+# In the Render dashboard: New + → Blueprint → pick this repo → Apply.
+# Render installs deps, builds the client, and runs the server (which serves
+# both the API and the built PWA) at a public HTTPS URL you can install on your phone.
+services:
+  - type: web
+    name: wonder
+    runtime: node
+    plan: free
+    # --include=dev is required because the build tools (Vite) live in devDependencies,
+    # which Render would otherwise skip under NODE_ENV=production.
+    buildCommand: npm install --include=dev && npm run build
+    startCommand: npm start
+    healthCheckPath: /api/health
+    autoDeploy: true
+    envVars:
+      - key: NODE_VERSION
+        value: "20"
+      - key: JWT_SECRET
+        generateValue: true
