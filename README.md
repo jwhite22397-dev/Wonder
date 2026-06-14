@@ -78,8 +78,32 @@ how romantic, indoor/outdoor, day-parts, dietary info). At request time the engi
    gaps with activities, tracking running cost and travel time.
 4. Produces **three diversified variants** (balanced / high-energy / relaxed) that avoid reusing the same spots.
 
-> 🔌 **Going to production?** Swap `venues.js` for a live source (Google Places, Yelp, Ticketmaster,
-> Eventbrite, …). The scoring/assembly engine stays the same.
+> 🔌 **Real venue data is built in via Google Places** (see below). The catalog above is the
+> automatic fallback used when no API key is configured, so the app always works.
+
+### Real places via Google Places API (New)
+
+Wonder ships with a pluggable provider ([`server/src/engine/providers/google.js`](server/src/engine/providers/google.js)):
+
+- **With a key** (`GOOGLE_MAPS_API_KEY`), each plan request does a few **Nearby Search (New)**
+  calls around the user's location/radius, maps the results (cuisine/type → interest tags, price
+  level, ratings, etc.) into the engine's venue shape, and uses **real businesses**. Results are
+  cached per location for 6 hours to limit API cost.
+- **Without a key**, it transparently falls back to the demo catalog. If a live call fails, it also
+  falls back — a plan is never empty.
+
+The Results screen shows a badge (📍 *Real places near you* vs 🧪 *Demo places*) so you always know
+which source produced a plan.
+
+**To enable it:**
+
+1. In [Google Cloud Console](https://console.cloud.google.com/), create a project, enable
+   **Places API (New)**, enable billing, and create an **API key** (restrict it to the Places API).
+2. Set it as an environment variable wherever the server runs:
+   - Local: `GOOGLE_MAPS_API_KEY=your_key npm start`
+   - Render: add `GOOGLE_MAPS_API_KEY` in the service's **Environment** tab (the included
+     `render.yaml` already declares it), then redeploy.
+3. That's it — new plans will use live nearby venues.
 
 ---
 
@@ -134,9 +158,10 @@ The server reads these optional environment variables:
 
 | Variable     | Default                  | Purpose                          |
 | ------------ | ------------------------ | -------------------------------- |
-| `PORT`       | `4000`                   | API / static server port         |
-| `JWT_SECRET` | `wonder-dev-secret-…`    | Set a strong secret in production |
-| `DB_PATH`    | `server/data/wonder.db`  | SQLite database file location     |
+| `PORT`                | `4000`                  | API / static server port               |
+| `JWT_SECRET`          | `wonder-dev-secret-…`   | Set a strong secret in production       |
+| `DB_PATH`             | `server/data/wonder.db` | SQLite database file location           |
+| `GOOGLE_MAPS_API_KEY` | _(unset)_               | Enables real venues via Places API (New) |
 
 ---
 

@@ -1,6 +1,7 @@
 import VENUE_CATALOG from '../data/venues.js';
 import { haversineMiles, makeRng, placeVenue } from './geo.js';
 import { scoreVenue, mergeProfiles, costForVenue, priceLabel } from './scoring.js';
+import { fetchGooglePlaces, isGoogleEnabled } from './providers/google.js';
 
 // ---- time helpers -----------------------------------------------------------
 function toMinutes(hhmm) {
@@ -60,8 +61,8 @@ const VARIANTS = [
   },
 ];
 
-// Build the placed, in-radius candidate pool for this request.
-function buildPool(req) {
+// Build a placed, in-radius candidate pool from the built-in demo catalog.
+function buildSyntheticPool(req) {
   const seed = `${req.location.lat.toFixed(3)},${req.location.lng.toFixed(3)}|${req.date || ''}`;
   const rng = makeRng(seed);
   const pool = [];
@@ -70,6 +71,22 @@ function buildPool(req) {
     if (placed.distanceMi <= req.radiusMi + 0.01) pool.push(placed);
   }
   return pool;
+}
+
+// Choose the data source: real Google Places when configured, else the demo catalog.
+// Always falls back to the demo catalog so a plan is never empty.
+async function getPool(req) {
+  if (isGoogleEnabled()) {
+    try {
+      const places = await fetchGooglePlaces(req);
+      const inRadius = places.filter((p) => p.distanceMi <= req.radiusMi + 0.5);
+      if (inRadius.length >= 4) return { pool: inRadius, source: 'google' };
+      console.warn(`Google Places returned only ${inRadius.length} usable venues; using demo catalog.`);
+    } catch (e) {
+      console.warn('Google Places lookup failed, using demo catalog:', e.message);
+    }
+  }
+  return { pool: buildSyntheticPool(req), source: 'demo' };
 }
 
 function passesFilters(venue, req, merged) {
@@ -177,7 +194,7 @@ function buildItinerary(req, pool, merged, profiles, variantCfg, globalUsed) {
       endTime: fmtTime(leave),
       travelFromPrevMin: stops.length === 0 ? null : travel,
       reasons: ensureReasons(s.reasons, s.venue, mealLabel),
-      mapUrl: `https://www.google.com/maps/search/?api=1&query=${s.venue.lat},${s.venue.lng}`,
+      mapUrl: s.venue.mapUrl || `https://www.google.com/maps/search/?api=1&query=${s.venue.lat},${s.venue.lng}`,
     });
     spent += s.cost;
     cursor = leave;
@@ -267,9 +284,9 @@ function buildDirectionsUrl(origin, stops) {
 }
 
 // ---- public API -------------------------------------------------------------
-export function generateItineraries(req, profiles) {
+export async function generateItineraries(req, profiles) {
   const merged = mergeProfiles(profiles);
-  const pool = buildPool(req);
+  const { pool, source } = await getPool(req);
   const globalUsed = new Set();
 
   const results = [];
@@ -287,7 +304,7 @@ export function generateItineraries(req, profiles) {
     }
   }
 
-  return results;
+  return { itineraries: results, source };
 }
 
 export { fmtTime, toMinutes };

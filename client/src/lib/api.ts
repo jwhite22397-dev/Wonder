@@ -146,6 +146,7 @@ export interface GenerateResult {
   request: PlanRequest;
   participants: { id: string; name: string; you: boolean }[];
   itineraries: Itinerary[];
+  dataSource?: 'google' | 'demo';
 }
 export interface Plan {
   id: string;

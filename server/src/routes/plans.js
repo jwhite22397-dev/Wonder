@@ -29,7 +29,8 @@ const generateSchema = z.object({
     .refine((v) => v.food || v.activities, { message: 'Include food, activities, or both.' }),
 });
 
-router.post('/plans/generate', requireAuth, (req, res) => {
+router.post('/plans/generate', requireAuth, async (req, res, next) => {
+  try {
   const parsed = generateSchema.safeParse(req.body);
   if (!parsed.success) return res.status(400).json({ error: parsed.error.issues[0].message });
   const input = parsed.data;
@@ -59,7 +60,7 @@ router.post('/plans/generate', requireAuth, (req, res) => {
     return res.status(400).json({ error: 'Add at least one friend to plan with.' });
   }
 
-  const itineraries = generateItineraries(input, profiles);
+  const { itineraries, source } = await generateItineraries(input, profiles);
   if (!itineraries.length) {
     return res.status(422).json({
       error:
@@ -67,7 +68,10 @@ router.post('/plans/generate', requireAuth, (req, res) => {
     });
   }
 
-  res.json({ request: input, participants, itineraries });
+    res.json({ request: input, participants, itineraries, dataSource: source });
+  } catch (err) {
+    next(err);
+  }
 });
 
 const saveSchema = z.object({

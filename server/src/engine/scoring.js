@@ -106,11 +106,18 @@ export function scoreVenue({ profiles, merged, venue, mode, variant, budgetPerSt
     budgetPenalty = Math.min(0.4, ((cost - budgetPerStop) / Math.max(budgetPerStop, 15)) * 0.3);
   }
 
+  // Quality: when real ratings are available, gently favor well-reviewed places.
+  const ratingBoost =
+    typeof venue.rating === 'number'
+      ? Math.max(-0.05, Math.min(0.08, (venue.rating - 4.0) * 0.06))
+      : 0;
+
   let score =
     0.42 * interest +
     0.2 * suitability +
     0.18 * vibe +
-    0.15 * romantic -
+    0.15 * romantic +
+    ratingBoost -
     distPenalty -
     diet -
     budgetPenalty;
@@ -128,6 +135,7 @@ export function scoreVenue({ profiles, merged, venue, mode, variant, budgetPerSt
   if (mode === 'solo' && suitability > 0.85) reasons.push('perfect for going solo');
   if (venue.price <= 1) reasons.push('easy on the wallet');
   if (venue.distanceMi != null && venue.distanceMi <= 3) reasons.push('close by');
+  if (typeof venue.rating === 'number' && venue.rating >= 4.4) reasons.push(`highly rated (${venue.rating.toFixed(1)}\u2605)`);
 
   return { score, reasons, cost, interest };
 }

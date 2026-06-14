@@ -18,3 +18,7 @@ services:
         value: "20"
       - key: JWT_SECRET
         generateValue: true
+      # Optional: paste your Google Maps Platform key (with the Places API (New) enabled)
+      # in the Render dashboard to switch from demo data to real nearby venues.
+      - key: GOOGLE_MAPS_API_KEY
+        sync: false

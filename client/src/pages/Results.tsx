@@ -56,6 +56,11 @@ export default function Results() {
           {request.location.label} · within {request.radiusMi} mi · up to ${request.budgetPerPerson}/person
           {request.date ? ` · ${prettyDate(request.date)}` : ''}
         </p>
+        <div style={{ marginTop: 10 }}>
+          <span className="pill-badge">
+            {result.dataSource === 'google' ? '📍 Real places near you' : '🧪 Demo places (add a Google API key for live data)'}
+          </span>
+        </div>
       </div>
 
       <ErrorBanner message={error} />
